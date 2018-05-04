@@ -135,6 +135,10 @@ namespace MvvmCrossTest.Core.Droid.Views
             if (now - LastFrameTime > TimeSpan.FromMilliseconds(1000))
             {
                 m_fpsDisplay.Text = m_frames.ToString();
+
+                if (UseOpenGL)
+                    m_fpsDisplay.Text += string.Format(" ({0})", m_glView.mRenderer.FPS.ToString());
+
                 LastFrameTime = now;
                 m_frames = 0;
             }

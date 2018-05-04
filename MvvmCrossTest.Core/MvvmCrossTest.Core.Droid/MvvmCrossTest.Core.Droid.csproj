@@ -224,7 +224,6 @@
     <Compile Include="Views\Camera2RAWView.cs" />
     <Compile Include="Views\CameraViews.cs" />
     <Compile Include="Views\DrawerView.cs" />
-    <Compile Include="Views\CameraView.cs" />
     <Compile Include="Views\Fragment\MySettingsFragment.cs" />
     <Compile Include="Views\Fragment\MyListFragment.cs" />
     <Compile Include="Views\Fragment\TabbedChildViewFragment.cs" />

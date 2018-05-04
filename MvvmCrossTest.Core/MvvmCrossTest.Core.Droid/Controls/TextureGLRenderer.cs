@@ -197,6 +197,11 @@ namespace MvvmCrossTest.Core.Droid.Controls
 
         private GLSquare m_square;
 
+        public int FPS
+        {
+            get { return mFPS; }
+        }
+
         public SimpleGLRenderer()
         {
             mFirstDraw = true;
@@ -231,15 +236,6 @@ namespace MvvmCrossTest.Core.Droid.Controls
             // Clears the screen and depth buffer.
             gl.GlClear(GL10.GlColorBufferBit | GL10.GlDepthBufferBit);
 
-            //gl.GlEnableClientState(GL10.GlVertexArray);
-            //gl.GlEnableClientState(GL10.GlColorArray);
-
-            // Replace the current matrix with the identity matrix
-            gl.GlLoadIdentity();
-
-            // Translates 4 units into the screen.
-            gl.GlTranslatef(0, 0, -4);
-
             m_square.Draw(gl);
         }
 
@@ -260,11 +256,11 @@ namespace MvvmCrossTest.Core.Droid.Controls
             // Reset the modelview matrix
             gl.GlLoadIdentity();
 
-            //// Replace the current matrix with the identity matrix
-            //gl.GlLoadIdentity();
+            // Replace the current matrix with the identity matrix
+            gl.GlLoadIdentity();
 
-            //// Translates 4 units into the screen.
-            //gl.GlTranslatef(0, 0, -4);
+            // Translates 4 units into the screen.
+            gl.GlTranslatef(0, 0, -4);
         }
 
         public void OnSurfaceCreated(IGL10 gl, Javax.Microedition.Khronos.Egl.EGLConfig config)

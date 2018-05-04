@@ -48,7 +48,6 @@
     <Compile Include="ViewModels\TestViewModel.cs" />
     <Compile Include="ViewModels\MySettingsViewModel.cs" />
     <Compile Include="ViewModels\MyListViewModel.cs" />
-    <Compile Include="ViewModels\CameraViewModel.cs" />
     <Compile Include="ViewModels\TabbedChildViewModel.cs" />
     <Compile Include="ViewModels\TabbedViewModel.cs" />
     <Compile Include="ViewModels\SecondViewModel.cs" />
