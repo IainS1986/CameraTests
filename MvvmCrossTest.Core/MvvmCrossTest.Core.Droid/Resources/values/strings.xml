@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ApplicationName">MvvmCrossTest.Core</string>
+    <string name="OpenDrawerString">Open</string>
+    <string name="CloseDrawerString">Close</string>
+</resources>
