@@ -22,8 +22,10 @@ using MvvmCrossTest.Core.Droid.Helper;
 
 namespace MvvmCrossTest.Core.Droid.Views
 {
-    public class BaseCameraView<TViewModel> : MvxFragment<TViewModel>, TextureView.ISurfaceTextureListener where TViewModel : class, IMvxViewModel 
+    public abstract class BaseCameraView<TViewModel> : MvxFragment<TViewModel>, TextureView.ISurfaceTextureListener where TViewModel : class, IMvxViewModel 
     {
+        protected abstract int LayoutResource { get; }
+
         //TODO MOVE TO FPS CONTROL
         public DateTime LastFrameTime = DateTime.Now;
 
@@ -76,7 +78,7 @@ namespace MvvmCrossTest.Core.Droid.Views
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var ignored = base.OnCreateView(inflater, container, savedInstanceState);
-            return this.BindingInflate(Resource.Layout.CameraView, null);
+            return this.BindingInflate(LayoutResource, null);
         }
 
         public override void OnDestroy()
@@ -129,10 +131,12 @@ namespace MvvmCrossTest.Core.Droid.Views
             m_preview = View.FindViewById<AutoFitTextureView>(Resource.Id.preview);
             m_preview.SurfaceTextureListener = this;
 
-            m_processedPreview = View.FindViewById<ImageView>(Resource.Id.processedPreview);
-            m_processedPreview.SetBackgroundColor(Color.HotPink);
-
-            if (UseOpenGL)
+            if(ViewProcessedPreview)
+            {
+                m_processedPreview = View.FindViewById<ImageView>(Resource.Id.processedPreview);
+                m_processedPreview.SetBackgroundColor(Color.HotPink);
+            }
+            else if (UseOpenGL)
             {
                 LinearLayout insert = View.FindViewById<LinearLayout>(Resource.Id.insert);
                 m_glView = new TextureGLSurfaceView(Activity);
@@ -286,8 +290,8 @@ namespace MvvmCrossTest.Core.Droid.Views
 
                 m_camera.StartPreview();
 
-                m_preview.Visibility = (ViewRawPreview || CameraCallback == false || (UseOpenGL == false && ViewProcessedPreview == false)) ? ViewStates.Visible : ViewStates.Gone;
-                m_processedPreview.Visibility = (ViewProcessedPreview && CameraCallback) ? ViewStates.Visible : ViewStates.Gone;
+                if (UseOpenGL || ViewProcessedPreview)
+                    m_preview.Visibility = ViewStates.Gone;
             }
             catch (Exception e)
             {
@@ -330,11 +334,14 @@ namespace MvvmCrossTest.Core.Droid.Views
     {
         public override string UniqueImmutableCacheTag => "CameraToSurfaceTextureView";
 
-        protected override bool UseOpenGL { get; set; } = false;
+        protected override int LayoutResource => Resource.Layout.CameraPreviewView;
+
         protected override bool ViewRawPreview { get; set; } = true;
         protected override bool ViewProcessedPreview { get; set; } = false;
-        protected override bool ProcessPreview { get; set; } = false;
+        protected override bool UseOpenGL { get; set; } = false;
+
         protected override bool CameraCallback { get; set; } = false;
+        protected override bool ProcessPreview { get; set; } = false;
     }
 
     [MvxFragment(typeof(DrawerViewModel), Resource.Id.frameLayout)]
@@ -343,11 +350,14 @@ namespace MvvmCrossTest.Core.Droid.Views
     {
         public override string UniqueImmutableCacheTag => "CameraToSurfaceTextureWithCallbackView";
 
-        protected override bool UseOpenGL { get; set; } = false;
+        protected override int LayoutResource => Resource.Layout.CameraPreviewView;
+
         protected override bool ViewRawPreview { get; set; } = true;
         protected override bool ViewProcessedPreview { get; set; } = false;
-        protected override bool ProcessPreview { get; set; } = false;
+        protected override bool UseOpenGL { get; set; } = false;
+
         protected override bool CameraCallback { get; set; } = true;
+        protected override bool ProcessPreview { get; set; } = false;
     }
 
     [MvxFragment(typeof(DrawerViewModel), Resource.Id.frameLayout)]
@@ -356,11 +366,14 @@ namespace MvvmCrossTest.Core.Droid.Views
     {
         public override string UniqueImmutableCacheTag => "CameraToSurfaceTextureWithCallbackAndProcessingView";
 
-        protected override bool UseOpenGL { get; set; } = false;
+        protected override int LayoutResource => Resource.Layout.CameraPreviewView;
+
         protected override bool ViewRawPreview { get; set; } = true;
         protected override bool ViewProcessedPreview { get; set; } = false;
-        protected override bool ProcessPreview { get; set; } = true;
+        protected override bool UseOpenGL { get; set; } = false;
+
         protected override bool CameraCallback { get; set; } = true;
+        protected override bool ProcessPreview { get; set; } = true;
     }
 
     [MvxFragment(typeof(DrawerViewModel), Resource.Id.frameLayout)]
@@ -369,11 +382,14 @@ namespace MvvmCrossTest.Core.Droid.Views
     {
         public override string UniqueImmutableCacheTag => "CameraToImageViewWithCallbackAndProcessingView";
 
-        protected override bool UseOpenGL { get; set; } = false;
+        protected override int LayoutResource => Resource.Layout.CameraProcessedImageView;
+
         protected override bool ViewRawPreview { get; set; } = false;
         protected override bool ViewProcessedPreview { get; set; } = true;
-        protected override bool ProcessPreview { get; set; } = true;
+        protected override bool UseOpenGL { get; set; } = false;
+
         protected override bool CameraCallback { get; set; } = true;
+        protected override bool ProcessPreview { get; set; } = true;
     }
 
     [MvxFragment(typeof(DrawerViewModel), Resource.Id.frameLayout)]
@@ -382,10 +398,13 @@ namespace MvvmCrossTest.Core.Droid.Views
     {
         public override string UniqueImmutableCacheTag => "CameraToOpenGLWithCallbackAndProcessingView";
 
-        protected override bool UseOpenGL { get; set; } = true;
+        protected override int LayoutResource => Resource.Layout.CameraProcessedOpenGLView;
+
         protected override bool ViewRawPreview { get; set; } = false;
         protected override bool ViewProcessedPreview { get; set; } = false;
-        protected override bool ProcessPreview { get; set; } = true;
+        protected override bool UseOpenGL { get; set; } = true;
+
         protected override bool CameraCallback { get; set; } = true;
+        protected override bool ProcessPreview { get; set; } = true;
     }
 }

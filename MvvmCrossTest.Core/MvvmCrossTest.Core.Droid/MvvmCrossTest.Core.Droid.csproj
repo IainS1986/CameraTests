@@ -181,9 +181,6 @@
     <AndroidResource Include="Resources\layout\MyListFragment.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
-    <AndroidResource Include="Resources\layout\CameraView.axml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
     <AndroidResource Include="Resources\layout\Dialogue.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
@@ -191,6 +188,15 @@
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\TestView.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\CameraPreviewView.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\CameraProcessedImageView.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\CameraProcessedOpenGLView.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
