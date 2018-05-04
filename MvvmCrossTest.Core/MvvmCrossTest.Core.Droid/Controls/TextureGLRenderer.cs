@@ -88,13 +88,12 @@ namespace MvvmCrossTest.Core.Droid.Controls
          */
         public void LoadBitmap(Bitmap bitmap)
         {
-            if(mBitmap != null)
-            {
-                mBitmap.Dispose();
-                mBitmap = null;
-            }
-
             mBitmap = bitmap;
+            mShouldLoadTexture = true;
+        }
+
+        public void UpdateBitmap()
+        {
             mShouldLoadTexture = true;
         }
 
@@ -216,6 +215,11 @@ namespace MvvmCrossTest.Core.Droid.Controls
         public void LoadTexture(Bitmap tex)
         {
             m_square.LoadBitmap(tex);
+        }
+
+        public void UpdateTexture()
+        {
+            m_square.UpdateBitmap();
         }
 
         public void OnDrawFrame(IGL10 gl)

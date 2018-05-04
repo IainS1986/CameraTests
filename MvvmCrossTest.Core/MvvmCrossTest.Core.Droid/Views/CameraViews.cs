@@ -48,11 +48,14 @@ namespace MvvmCrossTest.Core.Droid.Views
         protected virtual bool ViewProcessedPreview { get; set; } = false;
         protected virtual bool ProcessPreview { get; set; } = false;
         protected virtual bool CameraCallback { get; set; } = true;
-
         protected virtual bool UseFastAndroidCamera { get; set; } = false;
 
         //RGB Buffer to reduce allocation
         private int[] RGB;
+
+        //Bitmap re-used for rendering
+        private Bitmap m_bitmap;
+        private bool FirstFrame { get; set; } = true;
 
         public BaseCameraView()
         {
@@ -74,6 +77,29 @@ namespace MvvmCrossTest.Core.Droid.Views
         {
             var ignored = base.OnCreateView(inflater, container, savedInstanceState);
             return this.BindingInflate(Resource.Layout.CameraView, null);
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            
+            if(m_bitmap!=null)
+            {
+                m_bitmap.Dispose();
+                m_bitmap = null;
+            }
+
+            if(m_paint!=null)
+            {
+                m_paint.Dispose();
+                m_paint = null;
+            }
+
+            if(m_glView != null)
+            {
+                m_glView.Dispose();
+                m_glView = null;
+            }
         }
 
         public override void OnPause()
@@ -124,16 +150,7 @@ namespace MvvmCrossTest.Core.Droid.Views
                 GraphicsHelper.applyGrayScaleAndRotate90(RGB, data, size.Width, size.Height);
             }
 
-            if (UseOpenGL)
-            {
-                Bitmap bm = Bitmap.CreateBitmap(RGB, size.Height, size.Width, Bitmap.Config.Argb8888);
-                m_glView.mRenderer.LoadTexture(bm);
-            }
-            else if (ViewProcessedPreview)
-            {
-                Bitmap bm = Bitmap.CreateBitmap(RGB, size.Height, size.Width, Bitmap.Config.Argb8888);
-                m_processedPreview.SetImageBitmap(bm);
-            }
+            UpdateBitmapPreviews(size);
 
             //m_camera.AddCallbackBuffer(m_buffer);
 
@@ -148,20 +165,12 @@ namespace MvvmCrossTest.Core.Droid.Views
             using (FastJavaByteArray buffer = new FastJavaByteArray(data))
             {
                 // Pass it to native APIs
-                //myNativeBytePointerMethod(buffer.Raw, buffer.Count);
                 if(ProcessPreview)
+                {
                     GraphicsHelper.applyGrayScaleAndRotate90(RGB, buffer, size.Width, size.Height);
+                }
 
-                if (UseOpenGL)
-                {
-                    Bitmap bm = Bitmap.CreateBitmap(RGB, size.Height, size.Width, Bitmap.Config.Argb8888);
-                    m_glView.mRenderer.LoadTexture(bm);
-                }
-                else if (ViewProcessedPreview)
-                {
-                    Bitmap bm = Bitmap.CreateBitmap(RGB, size.Height, size.Width, Bitmap.Config.Argb8888);
-                    m_processedPreview.SetImageBitmap(bm);
-                }
+                UpdateBitmapPreviews(size);
 
                 // reuse the Java byte array; return it to the Camera API
                 camera.AddCallbackBuffer(buffer);
@@ -175,15 +184,42 @@ namespace MvvmCrossTest.Core.Droid.Views
             UpdateFPS();
         }
 
+        private void UpdateBitmapPreviews(Android.Hardware.Camera.Size size)
+        {
+            if (UseOpenGL)
+            {
+                //Bitmap bm = Bitmap.CreateBitmap(RGB, size.Height, size.Width, Bitmap.Config.Argb8888);
+                m_bitmap.SetPixels(RGB, 0, size.Height, 0, 0, size.Height, size.Width);
+
+                if (FirstFrame)
+                {
+                    m_glView.mRenderer.LoadTexture(m_bitmap);
+                }
+                else
+                {
+                    m_glView.mRenderer.UpdateTexture();
+                }
+            }
+            else if (ViewProcessedPreview)
+            {
+                //Bitmap bm = Bitmap.CreateBitmap(RGB, size.Height, size.Width, Bitmap.Config.Argb8888);
+                m_bitmap.SetPixels(RGB, 0, size.Height, 0, 0, size.Height, size.Width);
+
+                //Strangely, it seems faster doing this every frame than just first frame and updating texture. Maybe threading issue?
+                m_processedPreview.SetImageBitmap(m_bitmap);
+            }
+        }
+
         private void UpdateFPS()
         {
+            FirstFrame = false;
+
             DateTime now = DateTime.Now;
             if (now - LastFrameTime > TimeSpan.FromMilliseconds(1000))
             {
-                m_fpsDisplay.Text = m_frames.ToString();
+                string format = (UseOpenGL) ? "{0} ({1})" : "{0}";
 
-                if (UseOpenGL)
-                    m_fpsDisplay.Text += string.Format(" ({0})", m_glView.mRenderer.FPS.ToString());
+                m_fpsDisplay.Text = string.Format(format, m_frames.ToString(), m_glView?.mRenderer?.FPS.ToString());
 
                 LastFrameTime = now;
                 m_frames = 0;
@@ -197,11 +233,14 @@ namespace MvvmCrossTest.Core.Droid.Views
         {
             m_camera = Android.Hardware.Camera.Open();
 
+            //Generate single Bitmap for preview
+            var size = m_camera.GetParameters().PreviewSize;
+            m_bitmap = Bitmap.CreateBitmap(size.Height, size.Width, Bitmap.Config.Argb8888);
+
             m_previewCallback = new CameraPreviewCallback(OnFrame);
             m_fastPreviewCallback = new FastCameraPreviewCallback(OnFastFrame);
 
             var format = m_camera.GetParameters().PreviewFormat;
-            var size = m_camera.GetParameters().PreviewSize;
             int totalpixels = size.Width * size.Height;
             RGB = new int[totalpixels];
 
