@@ -43,6 +43,9 @@
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FastAndroidCamera, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\FastAndroidCamera.2.0.0\lib\MonoAndroid403\FastAndroidCamera.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -130,6 +133,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="FastAndroidCamera\" />
     <Folder Include="Resources\drawable-hdpi\" />
     <Folder Include="Resources\drawable-mdpi\" />
     <Folder Include="Resources\drawable-xhdpi\" />
@@ -194,6 +198,7 @@
   <ItemGroup>
     <Compile Include="Controls\AutoFitTextureView.cs" />
     <Compile Include="Controls\CameraCaptureCallback.cs" />
+    <Compile Include="Controls\FastCameraPreviewCallback.cs" />
     <Compile Include="Controls\CameraPreviewCaptureCallback.cs" />
     <Compile Include="Controls\CameraStateCallback.cs" />
     <Compile Include="Controls\CameraSurfaceTextureListener.cs" />
@@ -211,9 +216,6 @@
     <Compile Include="Controls\SurfaceTextureListener.cs" />
     <Compile Include="Controls\TextureGLRenderer.cs" />
     <Compile Include="DebugTrace.cs" />
-    <Compile Include="FastAndroidCamera\CameraExtensions.cs" />
-    <Compile Include="FastAndroidCamera\FastJavaByteArray.cs" />
-    <Compile Include="FastAndroidCamera\FastJavaByteArrayEnumerator.cs" />
     <Compile Include="Helper\GraphicsHelper.cs" />
     <Compile Include="Helper\Toast.cs" />
     <Compile Include="LinkerPleaseInclude.cs" />

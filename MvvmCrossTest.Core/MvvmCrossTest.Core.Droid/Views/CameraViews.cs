@@ -11,6 +11,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using ApxLabs.FastAndroidCamera;
 using MvvmCross.Binding.Droid.BindingContext;
 using MvvmCross.Core.ViewModels;
 using MvvmCross.Droid.Shared.Attributes;
@@ -33,6 +34,9 @@ namespace MvvmCrossTest.Core.Droid.Views
         public TextView m_fpsDisplay;
         private byte[] m_buffer;
 
+        //Fast Android Camera
+        public FastCameraPreviewCallback m_fastPreviewCallback;
+
         private Paint m_paint;
         private TextureGLSurfaceView m_glView;
 
@@ -44,6 +48,8 @@ namespace MvvmCrossTest.Core.Droid.Views
         protected virtual bool ViewProcessedPreview { get; set; } = false;
         protected virtual bool ProcessPreview { get; set; } = false;
         protected virtual bool CameraCallback { get; set; } = true;
+
+        protected virtual bool UseFastAndroidCamera { get; set; } = false;
 
         //RGB Buffer to reduce allocation
         private int[] RGB;
@@ -131,6 +137,46 @@ namespace MvvmCrossTest.Core.Droid.Views
 
             //m_camera.AddCallbackBuffer(m_buffer);
 
+            UpdateFPS();
+        }
+
+        private void OnFastFrame(IntPtr data, Android.Hardware.Camera camera)
+        {
+            var size = camera.GetParameters().PreviewSize;
+
+            // Wrap the JNI reference to the Java byte array
+            using (FastJavaByteArray buffer = new FastJavaByteArray(data))
+            {
+                // Pass it to native APIs
+                //myNativeBytePointerMethod(buffer.Raw, buffer.Count);
+                if(ProcessPreview)
+                    GraphicsHelper.applyGrayScaleAndRotate90(RGB, buffer, size.Width, size.Height);
+
+                if (UseOpenGL)
+                {
+                    Bitmap bm = Bitmap.CreateBitmap(RGB, size.Height, size.Width, Bitmap.Config.Argb8888);
+                    m_glView.mRenderer.LoadTexture(bm);
+                }
+                else if (ViewProcessedPreview)
+                {
+                    Bitmap bm = Bitmap.CreateBitmap(RGB, size.Height, size.Width, Bitmap.Config.Argb8888);
+                    m_processedPreview.SetImageBitmap(bm);
+                }
+
+                // reuse the Java byte array; return it to the Camera API
+                camera.AddCallbackBuffer(buffer);
+
+                // Don't do anything else with the buffer at this point - it now "belongs" to
+                // Android, and the Camera could overwrite the data at any time.
+            }
+            // The end of the using() block calls Dispose() on the buffer, releasing our JNI
+            // reference to the array
+
+            UpdateFPS();
+        }
+
+        private void UpdateFPS()
+        {
             DateTime now = DateTime.Now;
             if (now - LastFrameTime > TimeSpan.FromMilliseconds(1000))
             {
@@ -150,7 +196,9 @@ namespace MvvmCrossTest.Core.Droid.Views
         public void OnSurfaceTextureAvailable(SurfaceTexture surface, int width, int height)
         {
             m_camera = Android.Hardware.Camera.Open();
+
             m_previewCallback = new CameraPreviewCallback(OnFrame);
+            m_fastPreviewCallback = new FastCameraPreviewCallback(OnFastFrame);
 
             var format = m_camera.GetParameters().PreviewFormat;
             var size = m_camera.GetParameters().PreviewSize;
@@ -158,8 +206,6 @@ namespace MvvmCrossTest.Core.Droid.Views
             RGB = new int[totalpixels];
 
             int totalBytes = (totalpixels * ImageFormat.GetBitsPerPixel(format)) / 8;
-
-            m_buffer = new byte[totalBytes];
 
             //Hacking just for my moto g4 https://stackoverflow.com/questions/3841122/android-camera-preview-is-sideways
             m_camera.SetDisplayOrientation(90);
@@ -170,9 +216,33 @@ namespace MvvmCrossTest.Core.Droid.Views
 
                 if (CameraCallback)
                 {
-                    m_camera.SetPreviewCallback(m_previewCallback);
-                    //m_camera.SetPreviewCallbackWithBuffer(m_previewCallback);
-                    //m_camera.AddCallbackBuffer(m_buffer);
+                    if(UseFastAndroidCamera)
+                    {
+                        int NUM_PREVIEW_BUFFERS = 1;
+                        for (uint i = 0; i < NUM_PREVIEW_BUFFERS; ++i)
+                        {
+                            using (FastJavaByteArray buffer = new FastJavaByteArray(totalBytes))
+                            {
+                                // allocate new Java byte arrays for Android to use for preview frames
+                                m_camera.AddCallbackBuffer(new FastJavaByteArray(totalBytes));
+                            }
+                            // The using block automatically calls Dispose() on the buffer, which is safe
+                            // because it does not automaticaly destroy the Java byte array. It only releases
+                            // our JNI reference to that array; the Android Camera (in Java land) still
+                            // has its own reference to the array.
+                        }
+
+                        // non-marshaling version of the preview callback
+                        m_camera.SetNonMarshalingPreviewCallback(m_fastPreviewCallback);
+                    }
+                    else
+                    {
+                        m_camera.SetPreviewCallback(m_previewCallback);
+                        //m_camera.SetPreviewCallbackWithBuffer(m_previewCallback);
+
+                        //m_buffer = new byte[totalBytes];
+                        //m_camera.AddCallbackBuffer(m_buffer);
+                    }
                 }
 
                 m_camera.StartPreview();

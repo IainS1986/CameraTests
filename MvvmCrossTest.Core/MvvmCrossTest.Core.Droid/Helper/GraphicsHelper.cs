@@ -9,6 +9,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using ApxLabs.FastAndroidCamera;
 
 namespace MvvmCrossTest.Core.Droid.Helper
 {
@@ -85,6 +86,20 @@ namespace MvvmCrossTest.Core.Droid.Helper
             {
                 p = data[i] & 0xFF;
                 pixels[i] = (int)(0xff000000 | p << 16 | p << 8 | p);
+            }
+        }
+
+        public static void applyGrayScaleAndRotate90(int[] pixels, FastJavaByteArray data, int width, int height)
+        {
+            int p;
+            for (int y = 0, destinationColumn = height - 1; y < height; ++y, --destinationColumn)
+            {
+                int offset = y * width;
+                for (int x = 0; x < width; x++)
+                {
+                    p = data[(offset + x)] & 0xFF;
+                    pixels[(x * height + destinationColumn)] = (int)(0xff000000 | p << 16 | p << 8 | p);
+                }
             }
         }
 
