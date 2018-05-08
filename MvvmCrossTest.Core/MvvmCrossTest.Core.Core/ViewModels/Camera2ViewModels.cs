@@ -28,9 +28,16 @@ namespace MvvmCrossTest.Core.Core.ViewModels
         }
     }
 
-    public class Camera2ToImageViewModel : Camera2ViewModel
+    public class Camera2PreviewViewModel : Camera2ViewModel
     {
-        public Camera2ToImageViewModel(IMvxNavigationService navigationService) : base(navigationService)
+        public Camera2PreviewViewModel(IMvxNavigationService navigationService) : base(navigationService)
+        {
+        }
+    }
+
+    public class Camera2JNIGrayscaleViewModel : Camera2ViewModel
+    {
+        public Camera2JNIGrayscaleViewModel(IMvxNavigationService navigationService) : base(navigationService)
         {
         }
     }

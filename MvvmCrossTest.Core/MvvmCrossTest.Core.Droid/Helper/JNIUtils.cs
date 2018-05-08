@@ -17,7 +17,9 @@ namespace MvvmCrossTest.Core.Droid.Helper
     public class JNIUtils
     {
         [DllImport("libMobileLib", EntryPoint = "MvvmCrossTest_Core_Droid_Helper_JNIUtils_AndroidInfo")]
-        public static extern string AndroidInfo();
+        public static extern string AndroidInfo(
+            IntPtr env,
+            IntPtr jniClass);
 
         [DllImport("libMobileLib", EntryPoint = "MvvmCrossTest_Core_Droid_Helper_JNIUtils_GrayscaleDisplay")]
         public static extern void GrayscaleDisplay(
@@ -29,11 +31,30 @@ namespace MvvmCrossTest.Core.Droid.Helper
             IntPtr srcBuffer,
             IntPtr surface);
 
-        [DllImport("libMobileLib", EntryPoint = "Java_tau_camera2demo_JNIUtils_RGBADisplay")]
-        public static extern void RGBADisplay(int srcWidth, int srcHeight, int Y_rowStride, ByteBuffer Y_Buffer, int UV_rowStride, ByteBuffer U_Buffer, ByteBuffer V_Buffer, Surface surface);
+        [DllImport("libMobileLib", EntryPoint = "MvvmCrossTest_Core_Droid_Helper_JNIUtils_RGBADisplay")]
+        public static extern void RGBADisplay(
+            IntPtr env,
+            IntPtr jniClass,
+            int srcWidth,
+            int srcHeight, 
+            int Y_rowStride,
+            IntPtr Y_Buffer,
+            int UV_rowStride,
+            IntPtr U_Buffer,
+            IntPtr V_Buffer,
+            IntPtr surface);
 
-        [DllImport("libMobileLib", EntryPoint = "Java_tau_camera2demo_JNIUtils_RGBADisplay2")]
-        public static extern void RGBADisplay2(int srcWidth, int srcHeight, int Y_rowStride, ByteBuffer Y_Buffer, ByteBuffer U_Buffer, ByteBuffer V_Buffer, Surface surface);
+        [DllImport("libMobileLib", EntryPoint = "MvvmCrossTest_Core_Droid_Helper_JNIUtils_RGBADisplay2")]
+        public static extern void RGBADisplay2(
+            IntPtr env,
+            IntPtr jniClass,
+            int srcWidth,
+            int srcHeight, 
+            int Y_rowStride,
+            IntPtr Y_Buffer,
+            IntPtr U_Buffer,
+            IntPtr V_Buffer,
+            IntPtr surface);
 
     }
 }

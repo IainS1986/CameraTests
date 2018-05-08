@@ -35,13 +35,15 @@ namespace MvvmCrossTest.Core.Droid.Views
     {
         protected abstract int LayoutResource { get; }
 
+        protected virtual bool Preview { get; } = true;
+        protected virtual bool JNIGrayscale { get; } = false;
+
         //TODO MOVE TO FPS CONTROL
         public DateTime LastFrameTime = DateTime.Now;
         private int m_frames;
 
-
         public CameraDevice m_camera;
-        public string m_cameraID = "1";
+        public string m_cameraID = "0";
 
         public AutoFitTextureView m_preview;
         public Size m_previewSize;
@@ -152,13 +154,19 @@ namespace MvvmCrossTest.Core.Droid.Views
                 return;
             }
 
-            //MESS WITH IMAGE HERE
-            //string test = JNIUtils.AndroidInfo();
-
-            IntPtr env = IntPtr.Zero;
             IntPtr jniClass = IntPtr.Zero; // JNIEnv.FindClass("MobileLib");
 
+            //MESS WITH IMAGE HERE
+            //string test = JNIUtils.AndroidInfo(JNIEnv.Handle, jniClass);
+
             JNIUtils.GrayscaleDisplay(JNIEnv.Handle, jniClass, image.Width, image.Height, image.GetPlanes()[0].RowStride, image.GetPlanes()[0].Buffer.Handle, m_surface.Handle);
+
+            //Image.Plane Y_plane = image.GetPlanes()[0];
+            //int Y_rowStride = Y_plane.RowStride;
+            //Image.Plane U_plane = image.GetPlanes()[1];
+            //int UV_rowStride = U_plane.RowStride;  //in particular, uPlane.getRowStride() == vPlane.getRowStride()
+            //Image.Plane V_plane = image.GetPlanes()[2];
+            //JNIUtils.RGBADisplay(JNIEnv.Handle, jniClass, image.Width, image.Height, Y_rowStride, Y_plane.Buffer.Handle, UV_rowStride, U_plane.Buffer.Handle, V_plane.Buffer.Handle, m_surface.Handle);
 
 
             image.Close();
@@ -207,12 +215,17 @@ namespace MvvmCrossTest.Core.Droid.Views
 
             // the first added target surface is for camera PREVIEW display
             // the second added target mImageReader.getSurface() is for ImageReader Callback where we can access EACH frame
-            //mPreviewBuilder.addTarget(surface);
-            m_previewBuilder.AddTarget(m_imageReader.Surface);
+            if(Preview)
+                m_previewBuilder.AddTarget(m_surface);
+            else if(JNIGrayscale)
+                m_previewBuilder.AddTarget(m_imageReader.Surface);
 
             //output Surface
             List<Surface> outputSurfaces = new List<Surface>();
-            outputSurfaces.Add(m_imageReader.Surface);
+            if (Preview)
+                outputSurfaces.Add(m_surface);
+            else if (JNIGrayscale)
+                outputSurfaces.Add(m_imageReader.Surface);
 
             /*camera.createCaptureSession(
                     Arrays.asList(surface, mImageReader.getSurface()),
@@ -299,12 +312,28 @@ namespace MvvmCrossTest.Core.Droid.Views
     }
 
     [MvxFragment(typeof(DrawerViewModel), Resource.Id.frameLayout)]
-    [Register("mvvmcrosstest.core.droid.views.Camera2ToImageView")]
-    public class Camera2ToIamgeView : BaseCamera2View<Camera2ToImageViewModel>
+    [Register("mvvmcrosstest.core.droid.views.Camera2PreviewView")]
+    public class Camera2PreviewView : BaseCamera2View<Camera2PreviewViewModel>
     {
-        public override string UniqueImmutableCacheTag => "Camera2ToImageView";
+        public override string UniqueImmutableCacheTag => "Camera2PreviewView";
 
-        protected override int LayoutResource => Resource.Layout.Camera2ToImageView;
+        protected override bool Preview => true;
+        protected override bool JNIGrayscale => false;
+
+        protected override int LayoutResource => Resource.Layout.Camera2PreviewView;
+
+    }
+
+    [MvxFragment(typeof(DrawerViewModel), Resource.Id.frameLayout)]
+    [Register("mvvmcrosstest.core.droid.views.Camera2JNIGrayscaleView")]
+    public class Camera2JNIGrayscaleView : BaseCamera2View<Camera2JNIGrayscaleViewModel>
+    {
+        public override string UniqueImmutableCacheTag => "Camera2JNIGrayscaleView";
+
+        protected override bool Preview => false;
+        protected override bool JNIGrayscale => true;
+
+        protected override int LayoutResource => Resource.Layout.Camera2JNIGrayscaleView;
 
     }
 }
