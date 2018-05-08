@@ -752,12 +752,12 @@ namespace MvvmCrossTest.Core.Droid.Services
         #endregion
 
         #region ImageAvailable Callbacks
-        public void OnJpegImageAvailable()
+        public void OnJpegImageAvailable(ImageReader reader)
         {
             DequeueAndSaveImage(JpegResultQueue, JpegImageReader);
         }
 
-        public void OnRawImageAvailable()
+        public void OnRawImageAvailable(ImageReader reader)
         {
             DequeueAndSaveImage(RawResultQueue, RawImageReader);
         }

@@ -15,9 +15,9 @@ namespace MvvmCrossTest.Core.Droid.Controls
 {
     public class OnImageAvailableListener : Java.Lang.Object, ImageReader.IOnImageAvailableListener
     {
-        private Action OnAvailable;
+        private Action<ImageReader> OnAvailable;
 
-        public OnImageAvailableListener(Action onAvailable)
+        public OnImageAvailableListener(Action<ImageReader> onAvailable)
         {
             OnAvailable = onAvailable;
         }
@@ -25,7 +25,7 @@ namespace MvvmCrossTest.Core.Droid.Controls
         public void OnImageAvailable(ImageReader reader)
         {
             if (OnAvailable != null)
-                OnAvailable();
+                OnAvailable(reader);
         }
     }
 }

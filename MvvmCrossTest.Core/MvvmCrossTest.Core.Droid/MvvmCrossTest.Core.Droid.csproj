@@ -133,6 +133,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="cpp\" />
     <Folder Include="Resources\drawable-hdpi\" />
     <Folder Include="Resources\drawable-mdpi\" />
     <Folder Include="Resources\drawable-xhdpi\" />
@@ -160,6 +161,10 @@
     <AndroidResource Include="Resources\values-v21\styles.xml" />
   </ItemGroup>
   <ItemGroup>
+    <AndroidNativeLibrary Include="libMobileLib.so">
+	  <Abi>armeabi-v7a</Abi>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AndroidNativeLibrary>
     <None Include="packages.config" />
     <None Include="Properties\AndroidManifest.xml" />
     <None Include="Resources\AboutResources.txt" />
@@ -199,10 +204,14 @@
     <AndroidResource Include="Resources\layout\CameraProcessedOpenGLView.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
+    <AndroidResource Include="Resources\layout\Camera2ToImageView.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controls\AutoFitTextureView.cs" />
     <Compile Include="Controls\CameraCaptureCallback.cs" />
+    <Compile Include="Controls\CameraSessionStateCallback.cs" />
     <Compile Include="Controls\FastCameraPreviewCallback.cs" />
     <Compile Include="Controls\CameraPreviewCaptureCallback.cs" />
     <Compile Include="Controls\CameraStateCallback.cs" />
@@ -222,6 +231,7 @@
     <Compile Include="Controls\TextureGLRenderer.cs" />
     <Compile Include="DebugTrace.cs" />
     <Compile Include="Helper\GraphicsHelper.cs" />
+    <Compile Include="Helper\JNIUtils.cs" />
     <Compile Include="Helper\Toast.cs" />
     <Compile Include="LinkerPleaseInclude.cs" />
     <Compile Include="Services\DroidCameraService.cs" />
@@ -229,6 +239,7 @@
     <Compile Include="SplashScreen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Views\Camera2RAWView.cs" />
+    <Compile Include="Views\Camera2Views.cs" />
     <Compile Include="Views\CameraViews.cs" />
     <Compile Include="Views\DrawerView.cs" />
     <Compile Include="Views\Fragment\MySettingsFragment.cs" />
@@ -244,6 +255,12 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidAsset Include="Assets\AboutAssets.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidNativeLibrary Include="libTestLib.so">
+      <Abi>armeabi-v7a</Abi>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AndroidNativeLibrary>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\..\packages\Xamarin.Build.Download.0.4.5\build\Xamarin.Build.Download.targets" Condition="Exists('..\..\packages\Xamarin.Build.Download.0.4.5\build\Xamarin.Build.Download.targets')" />

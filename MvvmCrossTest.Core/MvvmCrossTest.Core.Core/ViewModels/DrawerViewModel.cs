@@ -19,7 +19,8 @@ namespace MvvmCrossTest.Core.Core.ViewModels
             typeof(CameraToSurfaceTextureWithCallbackAndProcessingViewModel),
             typeof(CameraToImageViewWithCallbackAndProcessingViewModel),
             typeof(CameraToOpenGLWithCallbackAndProcessingViewModel),
-            typeof(Camera2RAWViewModel)
+            typeof(Camera2RAWViewModel),
+            typeof(Camera2ToImageViewModel),
         };
 
         public IEnumerable<string> MenuItems { get; private set; } = new[] {
@@ -31,7 +32,9 @@ namespace MvvmCrossTest.Core.Core.ViewModels
             "Camera (Processing)",
             "Camera (Proc->Img)",
             "Camera (Proc->Opengl)",
-            "Camera2RAW" };
+            "Camera2RAW",
+            "Camera2 (Preview)"
+        };
 
         public void ShowDefaultMenuItem()
         {

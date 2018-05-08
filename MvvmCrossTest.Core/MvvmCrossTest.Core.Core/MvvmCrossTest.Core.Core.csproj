@@ -43,6 +43,7 @@
     <Compile Include="Services\Interfaces\ITestService.cs" />
     <Compile Include="Services\TestService.cs" />
     <Compile Include="ViewModels\Camera2RAWViewModel.cs" />
+    <Compile Include="ViewModels\Camera2ViewModels.cs" />
     <Compile Include="ViewModels\CameraViewModels.cs" />
     <Compile Include="ViewModels\DrawerViewModel.cs" />
     <Compile Include="ViewModels\TestViewModel.cs" />

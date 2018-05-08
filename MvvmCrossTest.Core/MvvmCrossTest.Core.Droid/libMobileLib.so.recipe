@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <SOLibPaths>C:\Dev\MobileLib\ARM\Debug\libMobileLib.so;C:\Microsoft\AndroidNDK64\android-ndk-r15c\prebuilt\android-arm\gdbserver\gdbserver;C:\Microsoft\AndroidNDK64\android-ndk-r15c\sources\cxx-stl\gnu-libstdc++\4.9\libs\armeabi-v7a\libgnustl_static.a</SOLibPaths>
+  <AndroidLibPaths />
+  <OObjPaths>C:\Dev\MobileLib\MobileLib\MobileLib.Android\ARM\Debug</OObjPaths>
+  <Configuration>Debug</Configuration>
+  <Platform>ARM</Platform>
+  <AndroidArchitecture>armeabi-v7a</AndroidArchitecture>
+  <!--links to other recipe files-->
+  <RecipeFiles />
+</project>

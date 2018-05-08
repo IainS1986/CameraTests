@@ -15,7 +15,7 @@ using MvvmCrossTest.Core.Droid.Services;
 
 namespace MvvmCrossTest.Core.Droid.Controls
 {
-    class CameraStateCallback : CameraDevice.StateCallback
+    public class CameraStateCallback : CameraDevice.StateCallback
     {
         private Action<CameraDevice> OnDeviceOpened;
         private Action<CameraDevice> OnDeviceDisconnected;
