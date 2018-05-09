@@ -156,9 +156,6 @@ namespace MvvmCrossTest.Core.Droid.Views
 
             IntPtr jniClass = IntPtr.Zero; // JNIEnv.FindClass("MobileLib");
 
-            //MESS WITH IMAGE HERE
-            //string test = JNIUtils.AndroidInfo(JNIEnv.Handle, jniClass);
-
             JNIUtils.GrayscaleDisplay(JNIEnv.Handle, jniClass, image.Width, image.Height, image.GetPlanes()[0].RowStride, image.GetPlanes()[0].Buffer.Handle, m_surface.Handle);
 
             //Image.Plane Y_plane = image.GetPlanes()[0];
@@ -166,7 +163,7 @@ namespace MvvmCrossTest.Core.Droid.Views
             //Image.Plane U_plane = image.GetPlanes()[1];
             //int UV_rowStride = U_plane.RowStride;  //in particular, uPlane.getRowStride() == vPlane.getRowStride()
             //Image.Plane V_plane = image.GetPlanes()[2];
-            //JNIUtils.RGBADisplay(JNIEnv.Handle, jniClass, image.Width, image.Height, Y_rowStride, Y_plane.Buffer.Handle, UV_rowStride, U_plane.Buffer.Handle, V_plane.Buffer.Handle, m_surface.Handle);
+            //JNIUtils.RGBADisplay2(JNIEnv.Handle, jniClass, image.Width, image.Height, Y_rowStride, Y_plane.Buffer.Handle, /*UV_rowStride,*/ U_plane.Buffer.Handle, V_plane.Buffer.Handle, m_surface.Handle);
 
 
             image.Close();
@@ -210,8 +207,11 @@ namespace MvvmCrossTest.Core.Droid.Views
             }
 
             // to set the format of captured images and the maximum number of images that can be accessed in mImageReader
-            m_imageReader = ImageReader.NewInstance(m_imageWidth, m_imageHeight, ImageFormatType.Yuv420888, 2);
-            m_imageReader.SetOnImageAvailableListener(m_onImageAvailableListener, m_handler);
+            if(JNIGrayscale)
+            {
+                m_imageReader = ImageReader.NewInstance(m_imageWidth, m_imageHeight, ImageFormatType.Yuv420888, 2);
+                m_imageReader.SetOnImageAvailableListener(m_onImageAvailableListener, m_handler);
+            }
 
             // the first added target surface is for camera PREVIEW display
             // the second added target mImageReader.getSurface() is for ImageReader Callback where we can access EACH frame
