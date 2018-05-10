@@ -41,4 +41,25 @@ namespace MvvmCrossTest.Core.Core.ViewModels
         {
         }
     }
+
+    public class Camera2JNIGrayscaleCCw90ViewModel : Camera2ViewModel
+    {
+        public Camera2JNIGrayscaleCCw90ViewModel(IMvxNavigationService navigationService) : base(navigationService)
+        {
+        }
+    }
+
+    public class Camera2RGBAViewModel : Camera2ViewModel
+    {
+        public Camera2RGBAViewModel(IMvxNavigationService navigationService) : base(navigationService)
+        {
+        }
+    }
+
+    public class Camera2RAWSensorViewModel : Camera2ViewModel
+    {
+        public Camera2RAWSensorViewModel(IMvxNavigationService navigationService) : base(navigationService)
+        {
+        }
+    }
 }

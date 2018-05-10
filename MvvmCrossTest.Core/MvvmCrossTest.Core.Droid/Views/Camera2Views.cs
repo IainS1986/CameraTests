@@ -37,6 +37,9 @@ namespace MvvmCrossTest.Core.Droid.Views
 
         protected virtual bool Preview { get; } = true;
         protected virtual bool JNIGrayscale { get; } = false;
+        protected virtual bool RGBAFormat { get; } = false;
+        protected virtual bool RawSensorFormat { get; } = false;
+        protected virtual bool Ccw90 { get; } = false;
 
         //TODO MOVE TO FPS CONTROL
         public DateTime LastFrameTime = DateTime.Now;
@@ -58,10 +61,6 @@ namespace MvvmCrossTest.Core.Droid.Views
 
         private Handler m_handler;
         private HandlerThread m_handlerThread;
-
-        // size of images captured in ImageReader Callback
-        private int m_imageWidth = 1920; //1920
-        private int m_imageHeight = 1080; //1080
 
         private Surface m_surface;
 
@@ -156,7 +155,47 @@ namespace MvvmCrossTest.Core.Droid.Views
 
             IntPtr jniClass = IntPtr.Zero; // JNIEnv.FindClass("MobileLib");
 
-            JNIUtils.GrayscaleDisplay(JNIEnv.Handle, jniClass, image.Width, image.Height, image.GetPlanes()[0].RowStride, image.GetPlanes()[0].Buffer.Handle, m_surface.Handle);
+            if (JNIGrayscale)
+            {
+                Image.Plane Y_plane = image.GetPlanes()[0];
+                int rowStride = Y_plane.RowStride;
+
+                int tW = m_preview.Width;
+                int tH = m_preview.Height;
+
+                if(Ccw90)
+                {
+                    JNIUtils.GrayscaleDisplayCcw90(JNIEnv.Handle, jniClass, image.Width, image.Height, rowStride, Y_plane.Buffer.Handle, m_surface.Handle);
+                }
+                else
+                {
+                    JNIUtils.GrayscaleDisplay(JNIEnv.Handle, jniClass, image.Width, image.Height, rowStride, Y_plane.Buffer.Handle, m_surface.Handle);
+                }
+            }
+            else if (RGBAFormat)
+            {
+                Image.Plane R_plane = image.GetPlanes()[0];
+                Image.Plane G_plane = image.GetPlanes()[1];
+                Image.Plane B_plane = image.GetPlanes()[2];
+                Image.Plane A_plane = image.GetPlanes()[3];
+                int rowStride = R_plane.RowStride;
+                JNIUtils.FlexRGBADisplay(
+                    JNIEnv.Handle,
+                    jniClass,
+                    image.Width,
+                    image.Height,
+                    rowStride,
+                    R_plane.Buffer.Handle,
+                    G_plane.Buffer.Handle,
+                    B_plane.Buffer.Handle,
+                    A_plane.Buffer.Handle,
+                    m_surface.Handle);
+            }
+            else if (RawSensorFormat)
+            {
+                Image.Plane S_Plane = image.GetPlanes()[0];
+            }
+
 
             //Image.Plane Y_plane = image.GetPlanes()[0];
             //int Y_rowStride = Y_plane.RowStride;
@@ -209,7 +248,17 @@ namespace MvvmCrossTest.Core.Droid.Views
             // to set the format of captured images and the maximum number of images that can be accessed in mImageReader
             if(JNIGrayscale)
             {
-                m_imageReader = ImageReader.NewInstance(m_imageWidth, m_imageHeight, ImageFormatType.Yuv420888, 2);
+                m_imageReader = ImageReader.NewInstance(m_preview.Width, m_preview.Height, ImageFormatType.Yuv420888, 2);
+                m_imageReader.SetOnImageAvailableListener(m_onImageAvailableListener, m_handler);
+            }
+            else if (RGBAFormat)
+            {
+                m_imageReader = ImageReader.NewInstance(m_preview.Width, m_preview.Height, ImageFormatType.FlexRgba8888, 2);
+                m_imageReader.SetOnImageAvailableListener(m_onImageAvailableListener, m_handler);
+            }
+            else if(RawSensorFormat)
+            {
+                m_imageReader = ImageReader.NewInstance(m_preview.Width, m_preview.Height, ImageFormatType.RawSensor, 2);
                 m_imageReader.SetOnImageAvailableListener(m_onImageAvailableListener, m_handler);
             }
 
@@ -217,14 +266,14 @@ namespace MvvmCrossTest.Core.Droid.Views
             // the second added target mImageReader.getSurface() is for ImageReader Callback where we can access EACH frame
             if(Preview)
                 m_previewBuilder.AddTarget(m_surface);
-            else if(JNIGrayscale)
+            else
                 m_previewBuilder.AddTarget(m_imageReader.Surface);
 
             //output Surface
             List<Surface> outputSurfaces = new List<Surface>();
             if (Preview)
                 outputSurfaces.Add(m_surface);
-            else if (JNIGrayscale)
+            else
                 outputSurfaces.Add(m_imageReader.Surface);
 
             /*camera.createCaptureSession(
@@ -272,7 +321,8 @@ namespace MvvmCrossTest.Core.Droid.Views
                 // to get stream configuration from features
                 StreamConfigurationMap map = (StreamConfigurationMap)characteristics.Get(CameraCharacteristics.ScalerStreamConfigurationMap);
                 // to get the size that the camera supports
-                m_previewSize = map.GetOutputSizes((int)ImageFormatType.Jpeg)[0];
+                var outputSizes = map.GetOutputSizes((int)ImageFormatType.Yuv420888);
+                m_previewSize = outputSizes[2];//960x720
 
                 // open camera
                 //if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.Camera) != PackageManager.PermissionGranted)
@@ -333,7 +383,50 @@ namespace MvvmCrossTest.Core.Droid.Views
         protected override bool Preview => false;
         protected override bool JNIGrayscale => true;
 
+        protected override int LayoutResource => Resource.Layout.Camera2JNIGrayscaleCCw90View;
+
+    }
+
+    [MvxFragment(typeof(DrawerViewModel), Resource.Id.frameLayout)]
+    [Register("mvvmcrosstest.core.droid.views.Camera2JNIGrayscaleCCw90View")]
+    public class Camera2JNIGrayscaleCCw90View : BaseCamera2View<Camera2JNIGrayscaleCCw90ViewModel>
+    {
+        public override string UniqueImmutableCacheTag => "Camera2JNIGrayscaleCCw90View";
+
+        protected override bool Preview => false;
+        protected override bool JNIGrayscale => true;
+        protected override bool Ccw90 => true;
+
         protected override int LayoutResource => Resource.Layout.Camera2JNIGrayscaleView;
+
+    }
+
+    [MvxFragment(typeof(DrawerViewModel), Resource.Id.frameLayout)]
+    [Register("mvvmcrosstest.core.droid.views.Camera2RGBAView")]
+    public class Camera2RGBAView : BaseCamera2View<Camera2RGBAViewModel>
+    {
+        public override string UniqueImmutableCacheTag => "Camera2RGBAView";
+
+        protected override bool Preview => false;
+        protected override bool JNIGrayscale => false;
+        protected override bool RGBAFormat => true;
+
+        protected override int LayoutResource => Resource.Layout.Camera2RGBAView;
+
+    }
+
+    [MvxFragment(typeof(DrawerViewModel), Resource.Id.frameLayout)]
+    [Register("mvvmcrosstest.core.droid.views.Camera2RAWSensorView")]
+    public class Camera2RAWSensorView : BaseCamera2View<Camera2RAWSensorViewModel>
+    {
+        public override string UniqueImmutableCacheTag => "Camera2RAWSensorView";
+
+        protected override bool Preview => false;
+        protected override bool JNIGrayscale => false;
+        protected override bool RGBAFormat => false;
+        protected override bool RawSensorFormat => true;
+
+        protected override int LayoutResource => Resource.Layout.Camera2RAWSensorView;
 
     }
 }

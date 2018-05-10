@@ -11,17 +11,20 @@ namespace MvvmCrossTest.Core.Core.ViewModels
         : MvxViewModel
     {
         readonly Type[] _menuItemTypes = {
-            typeof(MyListViewModel),
-            typeof(MySettingsViewModel),
-            typeof(FirstViewModel),
-            typeof(CameraToSurfaceTextureViewModel),
-            typeof(CameraToSurfaceTextureWithCallbackViewModel),
-            typeof(CameraToSurfaceTextureWithCallbackAndProcessingViewModel),
-            typeof(CameraToImageViewWithCallbackAndProcessingViewModel),
-            typeof(CameraToOpenGLWithCallbackAndProcessingViewModel),
-            typeof(Camera2RAWViewModel),
-            typeof(Camera2PreviewViewModel),
-            typeof(Camera2JNIGrayscaleViewModel),
+             typeof(MyListViewModel),
+             typeof(MySettingsViewModel),
+             typeof(FirstViewModel),
+             typeof(CameraToSurfaceTextureViewModel),
+             typeof(CameraToSurfaceTextureWithCallbackViewModel),
+             typeof(CameraToSurfaceTextureWithCallbackAndProcessingViewModel),
+             typeof(CameraToImageViewWithCallbackAndProcessingViewModel),
+             typeof(CameraToOpenGLWithCallbackAndProcessingViewModel),
+             typeof(Camera2RAWViewModel),
+             typeof(Camera2PreviewViewModel),
+             typeof(Camera2JNIGrayscaleViewModel),
+             typeof(Camera2JNIGrayscaleCCw90ViewModel),
+             /*typeof(Camera2RGBAViewModel),*/
+             /*typeof(Camera2RAWSensorViewModel),*/
         };
 
         public IEnumerable<string> MenuItems { get; private set; } = new[] {
@@ -35,7 +38,10 @@ namespace MvvmCrossTest.Core.Core.ViewModels
             "Camera (Proc->Opengl)",
             "Camera2RAW",
             "Camera2 (Preview)",
-            "Camera2 (JNI Grayscale)"
+            "Camera2 (JNI Grayscale)",
+            "Camera2 (JNI Grayscale CCw90)",
+            /*"Camera2 (JNI RGBA)",*/
+            /*"Camera2 (JNI RawSensor)",*/
         };
 
         public void ShowDefaultMenuItem()

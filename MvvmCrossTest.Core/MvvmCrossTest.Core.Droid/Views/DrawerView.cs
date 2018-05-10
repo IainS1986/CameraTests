@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace MvvmCrossTest.Core.Droid.Views
 {
-    [Activity]
+    [Activity(ScreenOrientation = Android.Content.PM.ScreenOrientation.Portrait)]
     public class DrawerView : MvxCachingFragmentCompatActivity<DrawerViewModel>
     {
         protected int LayoutResource => Resource.Layout.DrawerView;

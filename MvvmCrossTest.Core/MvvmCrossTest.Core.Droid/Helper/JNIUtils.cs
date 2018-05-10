@@ -31,6 +31,23 @@ namespace MvvmCrossTest.Core.Droid.Helper
             IntPtr srcBuffer,
             IntPtr surface);
 
+        [DllImport("libMobileLib", EntryPoint = "MvvmCrossTest_Core_Droid_Helper_JNIUtils_GrayscaleDisplayCcw90")]
+        public static extern void GrayscaleDisplayCcw90(
+           IntPtr env,
+           IntPtr jniClass,
+           int srcWidth,
+           int srcHeight,
+           int rowStride,
+           IntPtr srcBuffer,
+           IntPtr surface);
+
+        [DllImport("libMobileLib", EntryPoint = "MvvmCrossTest_Core_Droid_Helper_JNIUtils_GrayscaleMOTOGDisplay")]
+        public static extern void GrayscaleMOTOGDisplay(
+            IntPtr env,
+            IntPtr jniClass,
+            IntPtr srcBuffer,
+            IntPtr surface);
+
         [DllImport("libMobileLib", EntryPoint = "MvvmCrossTest_Core_Droid_Helper_JNIUtils_RGBADisplay")]
         public static extern void RGBADisplay(
             IntPtr env,
@@ -54,6 +71,19 @@ namespace MvvmCrossTest.Core.Droid.Helper
             IntPtr Y_Buffer,
             IntPtr U_Buffer,
             IntPtr V_Buffer,
+            IntPtr surface);
+
+        [DllImport("libMobileLib", EntryPoint = "MvvmCrossTest_Core_Droid_Helper_JNIUtils_FlexRGBADisplay")]
+        public static extern void FlexRGBADisplay(
+            IntPtr env,
+            IntPtr jniClass,
+            int srcWidth,
+            int srcHeight,
+            int rowStride,
+            IntPtr R_Buffer,
+            IntPtr G_Buffer,
+            IntPtr B_Buffer,
+            IntPtr A_Buffer,
             IntPtr surface);
 
     }
